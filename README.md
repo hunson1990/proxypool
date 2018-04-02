@@ -23,4 +23,5 @@ API 用flask做
 core 主要是一些核心模块，采集/测试/API
 instance 主要是一些封装，下载/数据库/爬虫模块
 utils 是一些工具函数 包含setting 文件
+![image](https://github.com/hunson1990/proxypool/blob/master/web.png?raw=true)
 
