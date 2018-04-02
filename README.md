@@ -17,7 +17,7 @@ flask制作api, 并通过web界面实时监控代理池的工作状态
 [API]
 API 用flask做
 
-
+![image](https://github.com/hunson1990/proxypool/blob/master/data.png?raw=true)
 
 
 core 主要是一些核心模块，采集/测试/API
