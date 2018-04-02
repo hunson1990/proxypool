@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script type="text/javascript" src="static/jquery-3.1.1.min.js"></script>
+    <title>线程池运行状态BY Mr.Guo</title>
+</head>
+
+<script>
+	function getMsg(url,func){
+	    // 访问url，并处理返回信息
+        //alert('getmsg');
+		$.get(url,function(data){
+            if(data){
+                func(data)
+            }else{alert("请求失败！")}
+		})
+	}
+
+	function check() {
+        alert('ooo')
+    }
+
+	function process_getworkJson(json) {
+        //处理获取器的json
+        jsondata = $.parseJSON(json);
+        //存储线程的页面显示实现
+        $("#savethread .table-row .iswork").text(jsondata.savemsg[0]);
+        $("#savethread .table-row .job").text(jsondata.savemsg[2]);
+        //下载线程的页面显示实现
+        //alert(jsondata.downmsg.length)
+        $("#downthread .table-row-group").each(
+            function (index) {
+                $(this).find('.iswork').text(jsondata.downmsg[index][0]);
+                $(this).find('.job').text(jsondata.downmsg[index][2]);
+            }
+        )
+    }
+
+    function process_testworkJson(json){
+	    jsondata = $.parseJSON(json);
+	    $("#testwork .ipcount span").text(jsondata.restip_count)
+    }
+
+    function process_ippoolJson(json) {
+        jsondata = $.parseJSON(json);
+        $("#ippool .ipcount span").text(jsondata.faildip_count)
+    }
+
+    function run() {
+        getMsg('/getwork',process_getworkJson);
+        getMsg('/testwork',process_testworkJson);
+        getMsg('/ippool',process_ippoolJson);
+    }
+
+	$(function(){
+		//getMsg('/getwork',process_getworkJson);
+	    setInterval(run,500);
+	})
+
+</script>
+
+<style>
+    body{padding: 20px;}
+    .model{ border: solid #dfdfdf 1px; display: table;}
+    .model .title{ background: #eeeeee; padding: 6px 20px;}
+    .model .con{ padding: 20px;}
+    .fl{float: left;}
+    .fr{float: right;}
+    h1{ font-size: 24px; padding: 0; margin: 0;}
+
+
+    h2{ font-size: 18px; padding: 5px 0;}
+
+    ul{margin:0;padding:0;list-style:none;}
+    .table{display:table;border-collapse:collapse;border:1px solid #ccc;}
+    .table-caption{display:table-caption;margin:0;padding:0;font-size:16px; padding: 5px 0;}
+    .table-column-group{display:table-column-group;}
+    .table-column{display:table-column;width:100px;}
+    .table-row-group{display:table-row-group;}
+    .table-row{display:table-row;}
+    .table-row-group .table-row:hover,.table-footer-group .table-row:hover{background:#f6f6f6;}
+    .table-cell{display:table-cell;padding:2px 5px;border:1px solid #ccc;white-space:nowrap;}
+    .table-header-group{display:table-header-group;background:#eee;font-weight:bold;}
+    .table-footer-group{display:table-footer-group;}
+</style>
+
+<body>
+
+
+
+<div class="fl">
+<div class="model" id="ippool" style="width: 300px;">
+    <div class="title"><h1>代理池</h1></div>
+    <div class="con">
+        <p class="ipcount">合格代理数: <span>{{mysqlcount}}</span></p>
+    </div>
+</div>
+
+
+<div class="model" id="testwork" style="width: 300px; margin-top: 20px;">
+    <div class="title"><h1>测试器</h1></div>
+    <div class="con">
+        <p class="url">测试目标网站: <br><span>{{testurl}}</span></p>
+        <p class="ipcount">待测试代理数: <span>{{rediscount}}</span></p>
+    </div>
+</div>
+</div>
+
+<div class="fl" style="margin-left: 40px;">
+<div class="model">
+    <div class="title"><h1>采集器</h1></div>
+    <div class="con">
+        {%if getterStatus%}
+        <div class="table" id="downthread">
+            <h2 class="table-caption">采集线程状态：</h2>
+            <div class="table-column-group">
+                <div class="table-column"></div>
+                <div class="table-column"></div>
+                <div class="table-column"></div>
+            </div>
+            <div class="table-header-group">
+                <ul class="table-row">
+                    <li class="table-cell">线程名字</li>
+                    <li class="table-cell">是否工作</li>
+                    <li class="table-cell">工作内容</li>
+                </ul>
+            </div>
+            {%for thread in downThreadsMsg%}
+            <div class="table-row-group">
+                <ul class="table-row">
+                    <li class="table-cell">{{thread[1]}}</li>
+                    <li class="table-cell iswork">{{thread[0]}}</li>
+                    <li class="table-cell job">{{thread[2]}}</li>
+                </ul>
+            </div>
+            {%endfor%}
+        </div>
+
+        <div class="table" id="savethread">
+            <h2 class="table-caption">存储线程状态：</h2>
+            <div class="table-column-group">
+                <div class="table-column"></div>
+                <div class="table-column"></div>
+                <div class="table-column"></div>
+            </div>
+            <div class="table-header-group">
+                <ul class="table-row">
+                    <li class="table-cell">线程名字</li>
+                    <li class="table-cell">是否工作</li>
+                    <li class="table-cell">工作内容</li>
+                </ul>
+            </div>
+            <div class="table-footer-group" style="display: none;">
+                <ul class="table-row">
+                    <li class="table-cell">footer</li>
+                    <li class="table-cell">footer</li>
+                    <li class="table-cell">footer</li>
+                </ul>
+            </div>
+            <div class="table-row-group">
+                <ul class="table-row">
+                    <li class="table-cell">{{saveThreadMsg[1]}}</li>
+                    <li class="table-cell iswork">{{saveThreadMsg[0]}}</li>
+                    <li class="table-cell job">{{saveThreadMsg[2]}}</li>
+                </ul>
+            </div>
+        </div>
+        {%else%}
+        <p>没有采集任务</p>
+        {%endif%}
+
+    </div>
+</div>
+</div>
+
+
+</body>
+</html>
